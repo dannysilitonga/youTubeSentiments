@@ -12,20 +12,32 @@ import Table from './Table';
 
 class App extends Component {
   state = {
-    data: []
+    data: [],
+    topVideoData: [],
+    activeVideo: null
   }
 
-  componentWillMount() {
-    json("https://sentimentviz-default-rtdb.firebaseio.com/sentiments_24_15_03.json")
+  componentWillMount() { 
+      json("https://sentimentviz-default-rtdb.firebaseio.com/sentiments_24_15_03.json") 
       .then(data => this.setState({ data }))
       .catch(error => console.log(error));
+
+      
+      json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_15_03.json")
+      .then(topVideoData => this.setState({ topVideoData }))
+      .catch(error => console.log(error));
   }
+  
+  updateVideo = (activeVideo) => this.setState({ activeVideo })
+
+
+            
 
   renderChart() {
     if (this.state.data.length == 0) {
       return "No data yet"
     }
-    return <ChartWrapper data={this.state.data} />
+    return <ChartWrapper data={this.state.data} topVideoData={this.state.topVideoData} updateVideo={this.updateVideo} />
   }
 
   render() {
@@ -46,7 +58,7 @@ class App extends Component {
          
           <Row>
             <Col md={6} xs={12}>{this.renderChart()}</Col>
-            <Col md={6} xs={12}><Table data={this.state.data} /></Col>
+            <Col md={6} xs={12}><Table data={this.state.data} topVideoData={this.state.topVideoData} activeVideo={this.state.activeVideo}/></Col>
           </Row>
         </Container>
       </div>

@@ -9,19 +9,38 @@ import Form from 'react-bootstrap/Form';
 
 export default class Table extends Component {
     renderRows() {
-        return (
-            console.log("New Data2", restrucOrigData(this.props.data).slice(0,20)),
-           
-            combineData(reorganizeData(getPolarityCount(restrucOrigData(this.props.data))).slice(0,50)).map(video => {
-                console.log(video)
+	const topVideoRestructured = restructureData(this.props.topVideoData)
+	const updatedData = combineData(reorganizeData(getPolarityCount(restrucOrigData(this.props.data))).slice(0,50))
+	
+	let mergedMarch15 = [];
+
+		for(let i=0; i<updatedData.length; i++) {
+			mergedMarch15.push({
+   			...updatedData[i],
+			sentimentDiff: updatedData[i].positiveSentimentCount - updatedData[i].negativeSentimentCount, 
+   			...(topVideoRestructured.find((itmInner) => itmInner.videoID === updatedData[i].videoID))}
+  			);
+		}
+	 
+	let mergedMarch15Sorted = mergedMarch15.sort((a, b) => a.sentimentDiff - b.sentimentDiff);
+	console.log("March 15 sorted", mergedMarch15Sorted)
+        return (  
+			     
+            mergedMarch15Sorted.map(video => {
+				
+				const background = (video.videoTitle === this.props.activeVideo) ? "grey" : "white"
+				
+		
                 return (
+					
                     <Row
-                        key={video.videoID}
-                        style= {{marginTop: "10px", marginLeft: "10px"}}
+                        key={video.videoTitle}
+                        style= {{ marginTop: "10px", backgroundColor: background }}
                     >
-                        <Col xs={3} style= {{ fontSize: 12}}>{video.videoID}</Col>
+                        <Col xs={3} style= {{ fontSize: 12}}>{video.videoTitle}</Col>
                         <Col xs={3} style= {{ fontSize: 12}}>{video.negativeSentimentCount}</Col>
                         <Col xs={3}style= {{ fontSize: 12}}>{video.positiveSentimentCount}</Col>
+						<Col xs={3}style= {{ fontSize: 12}}>{video.sentimentDiff}</Col>
                         
                 </Row>
                 )
@@ -44,8 +63,8 @@ export default class Table extends Component {
             <Row>
                 <Col xs={3}>
                     <Form.Control 
-                        placeholder={"ID"}
-                        video ID={"videoID"}
+                        placeholder={"Title"}
+                        video ID={"videoTitle"}
                     />
                 </Col>
                 <Col xs={3}>
@@ -58,6 +77,12 @@ export default class Table extends Component {
                     <Form.Control 
                         placeholder={"Pos"}
                         video ID={"positiveSentimentCount"}
+                    />
+                </Col>
+				<Col xs={3}>
+                    <Form.Control 
+                        placeholder={"Diff"}
+                        video ID={"sentimentDiff"}
                     />
                 </Col>
                 
@@ -131,4 +156,17 @@ function combineData(data) {
     return updatedData   
 }
 
-		
+function restructureData(raw_data) {
+	var USAVideoCount = [];
+	for(const videoID in raw_data['US']) {
+		USAVideoCount.push({
+			videoID: videoID,
+			videoTitle: raw_data['US'][videoID]['title'],	
+			videoCount: Number(raw_data['US'][videoID]['view_count'])
+		});
+	}
+	USAVideoCount = USAVideoCount.sort((a,b) => (a.videoCount < b.videoCount) ? 1: -1) 
+	return USAVideoCount
+}	
+
+
