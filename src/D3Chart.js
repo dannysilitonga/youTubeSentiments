@@ -6,11 +6,15 @@ const HEIGHT = 300 - MARGIN.TOP - MARGIN.BOTTOM
 
 
 class D3Chart {
-	constructor(element, data, topVideoData, updateVideo) {
+	constructor(element, data, topVideoData, dataMarch22, topVideoDataMarch22, updateVideo) {
+		console.log("sentiments", dataMarch22)
+		console.log("top videos", topVideoDataMarch22)
+
 		let vis = this
 		vis.updateVideo = updateVideo
+		
 		const topVideoRestructured = restructureData(topVideoData);
-		console.log(topVideoRestructured)
+		
 
 		const dataRestructured = restrucOrigData(data);
 		const dataRestructuredUpdated = getPolarityCount(dataRestructured);
@@ -27,9 +31,27 @@ class D3Chart {
    			...(topVideoRestructured.find((itmInner) => itmInner.videoID === updatedData[i].videoID))}
   			);
 		}
-		// console.log("mergedMarch15", mergedMarch15)
+	
+		vis.updatedDataMarch15 = mergedMarch15
 
-		vis.updatedData = mergedMarch15 
+		// march 22 data 
+		const topVideoRestructuredMarch22 = restructureData(topVideoDataMarch22);
+		const dataRestructuredMarch22 = restrucOrigData(dataMarch22);
+		const dataRestructuredUpdatedMarch22 = getPolarityCount(dataRestructuredMarch22);
+		const march22Data = reorganizeData(dataRestructuredUpdatedMarch22).slice(0, 50);
+		const filteredMarch22 = march22Data.filter(item => !(item.sentimentData.length < 3)); 
+		const updatedDataMarch22 = combineData(filteredMarch22)
+		console.log("combined march 22 data", updatedDataMarch22)
+
+		let mergedMarch22 = [];
+		for(let i=0; i<updatedDataMarch22.length; i++) {
+			mergedMarch22.push({
+   			...updatedDataMarch22[i], 
+   			...(topVideoRestructuredMarch22.find((itmInner) => itmInner.videoID === updatedDataMarch22[i].videoID))}
+  			);
+		}
+		console.log("mergedMarch22", mergedMarch22)
+		vis.updatedDataMarch22 = mergedMarch22
 
 		
 		//Promise.all([
@@ -80,12 +102,17 @@ class D3Chart {
 			.attr("text-anchor", "middle")
 			.text("Positive Sentiments")
 
-		vis.update()	
+		vis.update("march15")
 		
 	}
 
-	update() {
+	update(date) {
 		let vis = this
+
+		vis.updatedData = (date == "march15") ? vis.updatedDataMarch15 : vis.updatedDataMarch22
+
+		//if (date == "march15") vis.updatedData = vis.updatedDataMarch15
+		//	else if (date == "march22") vis.updatedData = vis.updatedDataMarch22
 
 		vis.x.domain([0, d3.max(vis.updatedData, d => Number(d.negativeSentimentCount))])
 		vis.y.domain([0, d3.max(vis.updatedData, d => Number(d.positiveSentimentCount))])
@@ -186,7 +213,7 @@ function combineData(data) {
 					videoID: item.videoID,
 					negativeSentimentCount: item.sentimentData.find(item =>item.analysis =="Negative")['count'],
 					neutralSentimentCount: item.sentimentData.find(item =>item.analysis =="Neutral")['count'],
-					positiveSentimentCount: item.sentimentData.find(item =>item.analysis =="Positive")['count']
+					positiveSentimentCount: item.sentimentData.find(item =>item.analysis =="Positive")['count']  //reduce((amt, t) => t.analysis === "Positive " ? t.positiveSentimentCount: amt, 0)
 				}
 				updatedData.push(dataExp);
 		})
