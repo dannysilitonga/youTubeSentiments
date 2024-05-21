@@ -1,10 +1,14 @@
 import * as d3 from 'd3'
 
-const MARGIN = { TOP: 30, BOTTOM: 300, LEFT: 90, RIGHT: 30 }
-const WIDTH = 860 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
+//const MARGIN = { TOP: 30, BOTTOM: 300, LEFT: 90, RIGHT: 30 }
+//const WIDTH = 860 - MARGIN.LEFT - MARGIN.RIGHT;
+//const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
 
-export default class D3Chart {
+const MARGIN = { TOP: 10, BOTTOM: 80, LEFT: 70, RIGHT: 10 }
+const WIDTH = 500 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 300 - MARGIN.TOP - MARGIN.BOTTOM
+
+export default class D3BarChart {
 	constructor(element) {
 		const vis = this
 
@@ -47,11 +51,14 @@ export default class D3Chart {
 			vis.april05Data = restructureData(datasets[3]).slice(0, 20)
 			vis.april15Data = restructureData(datasets[4]).slice(0,20)
 			vis.update("march15")
+
 		})
 	}
 
-	update(date) {
+	update(date, activeVideo) {
 		const vis = this
+		
+		
 
 		//vis.data = (date == "march15") ? vis.march15Data : vis.april15Data;
 
@@ -60,6 +67,9 @@ export default class D3Chart {
 		else if (date == "march29") vis.data = vis.march29Data
 		else if (date == "april05") vis.data = vis.april05Data
 		else if (date == "april15") vis.data = vis.april15Data
+
+		console.log("date is", date);
+		console.log("activeVideo", activeVideo);
 
 
 		const month = date.slice(0, -2).charAt(0).toUpperCase() + date.slice(0, -2).slice(1) 

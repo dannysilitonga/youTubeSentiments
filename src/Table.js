@@ -5,28 +5,27 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 
-
-
 export default class Table extends Component {
-    renderRows() {
+	renderRows() {
+	
+	// march 15
 	const topVideoRestructured = restructureData(this.props.topVideoData)
 	const updatedData = combineData(reorganizeData(getPolarityCount(restrucOrigData(this.props.data))).slice(0,50))
-	
-	let mergedMarch15 = [];
-
-		for(let i=0; i<updatedData.length; i++) {
-			mergedMarch15.push({
-   			...updatedData[i],
-			sentimentDiff: updatedData[i].positiveSentimentCount - updatedData[i].negativeSentimentCount, 
-   			...(topVideoRestructured.find((itmInner) => itmInner.videoID === updatedData[i].videoID))}
-  			);
-		}
-	 
+	let mergedMarch15 = flattenArray(updatedData, topVideoRestructured);	 
 	let mergedMarch15Sorted = mergedMarch15.sort((a, b) => a.sentimentDiff - b.sentimentDiff);
-	console.log("March 15 sorted", mergedMarch15Sorted)
+	
+	//Data March 22
+	const topVideoRestructuredMarch22 = restructureData(this.props.topVideoDataMarch22)
+	const updatedDataMarch22Temp = reorganizeData(getPolarityCount(restrucOrigData(this.props.dataMarch22))).slice(0,50);
+	const filteredMarch22 = updatedDataMarch22Temp.filter(item => !(item.sentimentData.length < 3));
+	const updatedDataMarch22 = combineData(filteredMarch22);
+	let mergedMarch22 = flattenArray(updatedDataMarch22, topVideoRestructuredMarch22); 
+	let mergedMarch22Sorted = mergedMarch22.sort((a, b) => a.sentimentDiff - b.sentimentDiff);
+
+	const data = (this.props.date == "march15") ?  mergedMarch15Sorted : mergedMarch22Sorted	
+
         return (  
-			     
-            mergedMarch15Sorted.map(video => {
+            data.map(video => {
 				
 				const background = (video.videoTitle === this.props.activeVideo) ? "grey" : "white"
 				
@@ -37,51 +36,44 @@ export default class Table extends Component {
                         key={video.videoTitle}
                         style= {{ marginTop: "10px", backgroundColor: background }}
                     >
-                        <Col xs={3} style= {{ fontSize: 12}}>{video.videoTitle}</Col>
-                        <Col xs={3} style= {{ fontSize: 12}}>{video.negativeSentimentCount}</Col>
-                        <Col xs={3}style= {{ fontSize: 12}}>{video.positiveSentimentCount}</Col>
-						<Col xs={3}style= {{ fontSize: 12}}>{video.sentimentDiff}</Col>
+                        <Col xs={6} style= {{ fontSize: 11}}>{video.videoTitle}</Col>
+                        <Col xs={2} style= {{ fontSize: 11}}>{video.negativeSentimentCount}</Col>
+                        <Col xs={2}style= {{ fontSize: 11}}>{video.positiveSentimentCount}</Col>
+						<Col xs={2}style= {{ fontSize: 11}}>{video.sentimentDiff}</Col>
                         
                 </Row>
                 )
             })
         )
     }
-        
-		//const dataRestructuredUpdated = getPolarityCount(dataRestructured);
-		//console.log("march15DataTemp", dataRestructuredUpdated)
-		//const march15Data = reorganizeData(dataRestructuredUpdated).slice(0, 50);
-		//console.log("march 15 Data", vis.march15Data)
-		
-		
-		
-
-
     render() {
         return (
         <div>
             <Row>
-                <Col xs={3}>
+                <Col xs={6}>
                     <Form.Control 
-                        placeholder={"Title"}
+                        placeholder={"Video Title"}
+						style={{ fontSize: 11 }}
                         video ID={"videoTitle"}
                     />
                 </Col>
-                <Col xs={3}>
+                <Col xs={2}>
                     <Form.Control 
-                        placeholder={"Neg"}
+                        placeholder={"-"}
+						style={{ fontSize: 11 }}
                         video ID={"negativeSentimentCount"}
                     />
                 </Col>
-                <Col xs={3}>
+                <Col xs={2}>
                     <Form.Control 
-                        placeholder={"Pos"}
+                        placeholder={"+"}
                         video ID={"positiveSentimentCount"}
                     />
                 </Col>
-				<Col xs={3}>
+				<Col xs={2}>
                     <Form.Control 
-                        placeholder={"Diff"}
+                        placeholder={"D"}
+						style={{ fontSize: 11 }}
                         video ID={"sentimentDiff"}
                     />
                 </Col>
@@ -169,4 +161,17 @@ function restructureData(raw_data) {
 	return USAVideoCount
 }	
 
+function flattenArray(sentimentData, topVideoData){
+	let merged = [];
+
+	for(let i=0; i<sentimentData.length; i++) {
+	merged.push({
+	   ...sentimentData[i], 
+	   sentimentDiff: sentimentData[i].positiveSentimentCount - sentimentData[i].negativeSentimentCount, 
+	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
+	  );
+}
+	return merged
+
+}
 

@@ -7,31 +7,19 @@ const HEIGHT = 300 - MARGIN.TOP - MARGIN.BOTTOM
 
 class D3Chart {
 	constructor(element, data, topVideoData, dataMarch22, topVideoDataMarch22, updateVideo) {
-		console.log("sentiments", dataMarch22)
-		console.log("top videos", topVideoDataMarch22)
+		//console.log("sentiments", dataMarch22)
+		//console.log("top videos", topVideoDataMarch22)
 
 		let vis = this
 		vis.updateVideo = updateVideo
 		
-		const topVideoRestructured = restructureData(topVideoData);
-		
-
+		// march 15 data
+		const topVideoRestructured = restructureData(topVideoData);		
 		const dataRestructured = restrucOrigData(data);
 		const dataRestructuredUpdated = getPolarityCount(dataRestructured);
 		const march15Data = reorganizeData(dataRestructuredUpdated).slice(0, 50);
-		//console.log("polarity count data", dataRestructuredUpdated)
-		
 		const updatedData = combineData(march15Data)
-		
-		let mergedMarch15 = [];
-
-		for(let i=0; i<updatedData.length; i++) {
-			mergedMarch15.push({
-   			...updatedData[i], 
-   			...(topVideoRestructured.find((itmInner) => itmInner.videoID === updatedData[i].videoID))}
-  			);
-		}
-	
+		const mergedMarch15 = flattenArray(updatedData, topVideoRestructured);	
 		vis.updatedDataMarch15 = mergedMarch15
 
 		// march 22 data 
@@ -40,17 +28,8 @@ class D3Chart {
 		const dataRestructuredUpdatedMarch22 = getPolarityCount(dataRestructuredMarch22);
 		const march22Data = reorganizeData(dataRestructuredUpdatedMarch22).slice(0, 50);
 		const filteredMarch22 = march22Data.filter(item => !(item.sentimentData.length < 3)); 
-		const updatedDataMarch22 = combineData(filteredMarch22)
-		console.log("combined march 22 data", updatedDataMarch22)
-
-		let mergedMarch22 = [];
-		for(let i=0; i<updatedDataMarch22.length; i++) {
-			mergedMarch22.push({
-   			...updatedDataMarch22[i], 
-   			...(topVideoRestructuredMarch22.find((itmInner) => itmInner.videoID === updatedDataMarch22[i].videoID))}
-  			);
-		}
-		console.log("mergedMarch22", mergedMarch22)
+		const updatedDataMarch22 = combineData(filteredMarch22);
+		const mergedMarch22 = flattenArray(updatedDataMarch22, topVideoRestructuredMarch22);
 		vis.updatedDataMarch22 = mergedMarch22
 
 		
@@ -232,5 +211,20 @@ function restructureData(raw_data) {
 	USAVideoCount = USAVideoCount.sort((a,b) => (a.videoCount < b.videoCount) ? 1: -1) 
 	return USAVideoCount
 }
+
+function flattenArray(sentimentData, topVideoData){
+	let merged = [];
+
+	for(let i=0; i<sentimentData.length; i++) {
+	merged.push({
+	   ...sentimentData[i], 
+	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
+	  );
+}
+	return merged
+
+}
+
+
 
 export default D3Chart
