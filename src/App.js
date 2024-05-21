@@ -69,7 +69,7 @@ class App extends Component {
     if (this.state.data.length == 0) {
       return "No data yet"
     }
-    return <BarChartWrapper data={this.state.data} topVideoData={this.state.topVideoData} dataMarch22={this.state.dataMarch22} topVideoDataMarch22={this.state.topVideoDataMarch22} activeVideo={this.state.activeVideo} date={this.state.date} />
+    return <BarChartWrapper topVideoData={this.state.topVideoData} topVideoDataMarch22={this.state.topVideoDataMarch22} date={this.state.date} />
   }
 
   renderChart() {
@@ -86,9 +86,9 @@ class App extends Component {
         <Navbar bg="light">
           <Navbar.Brand>Sentiment Analysis</Navbar.Brand>
         </Navbar>
-        <Container>
+        <Container fluid>
           <Row> 
-            <p>This projects examines the level of positive and negative sentiments on Youtube top trending videos. </p>
+            <p style={{marginLeft: 15}}>This projects examines the level of positive and negative sentiments on Youtube top trending videos. </p>
             <p> </p>
             <p> </p>
           </Row>
@@ -100,10 +100,10 @@ class App extends Component {
             <Row>
               <Col md={7} xs={12}>
                <Row>
-                <Col md={7} xs={12}>{this.renderChart()}</Col>
+                <Col style={{display:'flex', justifyContent:'left'}} md={7} xs={12}>{this.renderBarChart()} </Col>
                 </Row>
               <Row> 
-                <Col md={7} xs={12}>{this.renderBarChart()}</Col>
+                <Col style={{display:'flex', justifyContent:'left'}} md={7} xs={12}>{this.renderChart()} </Col>
               </Row>
               </Col>
             <Col md={5} xs={12}><Table data={this.state.data} topVideoData={this.state.topVideoData} dataMarch22={this.state.dataMarch22} topVideoDataMarch22={this.state.topVideoDataMarch22} activeVideo={this.state.activeVideo} date={this.state.date}/></Col>

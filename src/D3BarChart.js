@@ -4,13 +4,16 @@ import * as d3 from 'd3'
 //const WIDTH = 860 - MARGIN.LEFT - MARGIN.RIGHT;
 //const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
 
-const MARGIN = { TOP: 10, BOTTOM: 80, LEFT: 70, RIGHT: 10 }
-const WIDTH = 500 - MARGIN.LEFT - MARGIN.RIGHT
-const HEIGHT = 300 - MARGIN.TOP - MARGIN.BOTTOM
+const MARGIN = { TOP: 10, BOTTOM: 120, LEFT: 100, RIGHT: 10 }
+const WIDTH = 1100 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM
 
 export default class D3BarChart {
-	constructor(element) {
+	constructor(element, topVideoData, topVideoDataMarch22) {
+		
 		const vis = this
+		const numberVideos = 50;
+		
 
 		vis.svg = d3.select(element)
 			.append("svg")
@@ -37,25 +40,28 @@ export default class D3BarChart {
 
 		vis.yAxisGroup = vis.svg.append("g")
 
-		Promise.all([
-			d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_15_03.json"),
-			d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_22_03.json"),
-			d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_29_03.json"),
-			d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_05_04.json"),
-			d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_15_04.json")
-		]).then((datasets) => {
+		//Promise.all([
+		//	d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_15_03.json"),
+		//	d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_22_03.json"),
+		//	d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_29_03.json"),
+		//	d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_05_04.json"),
+		//	d3.json("https://sentimentviz-default-rtdb.firebaseio.com/top_videos_24_15_04.json")
+		//]).then((datasets) => {
 			
-			vis.march15Data = restructureData(datasets[0]).slice(0, 20)
-			vis.march22Data = restructureData(datasets[1]).slice(0, 20)
-			vis.march29Data = restructureData(datasets[2]).slice(0, 20)
-			vis.april05Data = restructureData(datasets[3]).slice(0, 20)
-			vis.april15Data = restructureData(datasets[4]).slice(0,20)
-			vis.update("march15")
+		//	vis.march15Data = restructureData(datasets[0]).slice(0, 20)
+		//	vis.march22Data = restructureData(datasets[1]).slice(0, 20)
+		//	vis.march29Data = restructureData(datasets[2]).slice(0, 20)
+		//	vis.april05Data = restructureData(datasets[3]).slice(0, 20)
+		//	vis.april15Data = restructureData(datasets[4]).slice(0,20)
+		//	vis.update("march15")
 
-		})
+		//})
+		vis.march15Data = restructureData(topVideoData).slice(0, numberVideos)
+			vis.march22Data = restructureData(topVideoDataMarch22).slice(0, numberVideos)
+			vis.update("march15")
 	}
 
-	update(date, activeVideo) {
+	update(date) {
 		const vis = this
 		
 		
@@ -64,12 +70,11 @@ export default class D3BarChart {
 
 		if (date == "march15") vis.data = vis.march15Data
 		else if (date == "march22") vis.data = vis.march22Data
-		else if (date == "march29") vis.data = vis.march29Data
-		else if (date == "april05") vis.data = vis.april05Data
-		else if (date == "april15") vis.data = vis.april15Data
+		//else if (date == "march29") vis.data = vis.march29Data
+		//else if (date == "april05") vis.data = vis.april05Data
+		//else if (date == "april15") vis.data = vis.april15Data
 
-		console.log("date is", date);
-		console.log("activeVideo", activeVideo);
+		
 
 
 		const month = date.slice(0, -2).charAt(0).toUpperCase() + date.slice(0, -2).slice(1) 
@@ -78,12 +83,14 @@ export default class D3BarChart {
 
 		//console.log("converted date month", converted_month_date)
 
-
+		console.log("data", vis.march15Data);	
 		vis.xLabel.text(`Top Trending Videos on ${converted_month_date}`)
+
+		const titleLimit = 8;
 
 		const x = d3.scaleBand()
       		.range([0, WIDTH])
-      		.domain(vis.data.map((d) => d.videoTitle))
+      		.domain(vis.data.map((d) => truncate(d.videoTitle, titleLimit)))
       		.padding(0.5)
     	
 		const xAxisCall = d3.axisBottom(x)
@@ -118,14 +125,14 @@ export default class D3BarChart {
 
     	// UPDATE 
     	rects.transition().duration(500)
-      		.attr("x", d => x(d.videoTitle))
+      		.attr("x", d => x(truncate(d.videoTitle, titleLimit)))
       		.attr("y", d => y(d.videoCount))
       		.attr("width", x.bandwidth)
       		.attr("height", d => HEIGHT - y(d.videoCount))
 
     	// ENTER
     	rects.enter().append("rect")
-      	.attr("x", d => x(d.videoTitle))
+      	.attr("x", d => x(truncate(d.videoTitle, titleLimit)))
       	.attr("width", x.bandwidth)
       	.attr("fill", "#5f0f40")
       	.attr("y", HEIGHT)
@@ -139,10 +146,15 @@ function restructureData(raw_data) {
 	var USAVideoCount = [];
 	for(const videoID in raw_data['US']) {
 		USAVideoCount.push({
-			videoTitle: videoID,
+			videoID: videoID,
+			videoTitle: raw_data['US'][videoID]['title'],	
 			videoCount: Number(raw_data['US'][videoID]['view_count'])
 		});
 	}
 	USAVideoCount = USAVideoCount.sort((a,b) => (a.videoCount < b.videoCount) ? 1: -1) 
 	return USAVideoCount
 }
+
+function truncate(str, n){
+	return (str.length > n) ? str.slice(0, n-1) + '&hellip;' : str;
+  };

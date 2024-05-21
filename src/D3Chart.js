@@ -1,8 +1,8 @@
 import * as d3 from 'd3'
 
-const MARGIN = { TOP: 10, BOTTOM: 80, LEFT: 70, RIGHT: 10 }
-const WIDTH = 500 - MARGIN.LEFT - MARGIN.RIGHT
-const HEIGHT = 300 - MARGIN.TOP - MARGIN.BOTTOM
+const MARGIN = { TOP: 20, BOTTOM: 80, LEFT: 100, RIGHT: 10 }
+const WIDTH = 1100 - MARGIN.LEFT - MARGIN.RIGHT
+const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM
 
 
 class D3Chart {
@@ -12,25 +12,29 @@ class D3Chart {
 
 		let vis = this
 		vis.updateVideo = updateVideo
+
+		const numberVideos = 50;
 		
 		// march 15 data
-		const topVideoRestructured = restructureData(topVideoData);		
+		const topVideoRestructured = restructureData(topVideoData).slice(0, numberVideos);
 		const dataRestructured = restrucOrigData(data);
 		const dataRestructuredUpdated = getPolarityCount(dataRestructured);
-		const march15Data = reorganizeData(dataRestructuredUpdated).slice(0, 50);
-		const updatedData = combineData(march15Data)
-		const mergedMarch15 = flattenArray(updatedData, topVideoRestructured);	
+		const march15Data = reorganizeData(dataRestructuredUpdated);
+		const filteredMarch15 = march15Data.filter(item => !(item.sentimentData.length < 3)); 
+		const updatedData = combineData(filteredMarch15)
+		const mergedMarch15 = flattenArray3(updatedData, topVideoRestructured);	
 		vis.updatedDataMarch15 = mergedMarch15
 
 		// march 22 data 
-		const topVideoRestructuredMarch22 = restructureData(topVideoDataMarch22);
+		const topVideoRestructuredMarch22 = restructureData(topVideoDataMarch22).slice(0,numberVideos);
 		const dataRestructuredMarch22 = restrucOrigData(dataMarch22);
 		const dataRestructuredUpdatedMarch22 = getPolarityCount(dataRestructuredMarch22);
-		const march22Data = reorganizeData(dataRestructuredUpdatedMarch22).slice(0, 50);
+		const march22Data = reorganizeData(dataRestructuredUpdatedMarch22)
 		const filteredMarch22 = march22Data.filter(item => !(item.sentimentData.length < 3)); 
 		const updatedDataMarch22 = combineData(filteredMarch22);
-		const mergedMarch22 = flattenArray(updatedDataMarch22, topVideoRestructuredMarch22);
-		vis.updatedDataMarch22 = mergedMarch22
+		const mergedMarch22 = flattenArray3(updatedDataMarch22, topVideoRestructuredMarch22);
+		let mergedMarch22Sorted = mergedMarch22.sort((a, b) => a.percentNegative - b.percentNegative) //a.sentimentDiff - b.sentimentDiff);
+		vis.updatedDataMarch22 = mergedMarch22Sorted
 
 		
 		//Promise.all([
@@ -93,8 +97,8 @@ class D3Chart {
 		//if (date == "march15") vis.updatedData = vis.updatedDataMarch15
 		//	else if (date == "march22") vis.updatedData = vis.updatedDataMarch22
 
-		vis.x.domain([0, d3.max(vis.updatedData, d => Number(d.negativeSentimentCount))])
-		vis.y.domain([0, d3.max(vis.updatedData, d => Number(d.positiveSentimentCount))])
+		vis.x.domain([0, d3.max(vis.updatedData, d => Number(d.percentNegative))])
+		vis.y.domain([0, d3.max(vis.updatedData, d => Number(d.percentPositive))])
 
 		const xAxisCall = d3.axisBottom(vis.x)
 		const yAxisCall = d3.axisLeft(vis.y)
@@ -116,18 +120,18 @@ class D3Chart {
 
 		// UPDATE 
 		circles.transition(1000)
-			.attr("cx", d => vis.x(d.negativeSentimentCount))
-			.attr("cy", d => vis.y(d.positiveSentimentCount))
+			.attr("cx", d => vis.x(d.percentNegative))
+			.attr("cy", d => vis.y(d.percentPositive))
 
 		// ENTER
 		circles.enter().append("circle")
 			.attr("cy", vis.y(0))
-			.attr("cx", d => vis.x(d.negativeSentimentCount))
+			.attr("cx", d => vis.x(d.percentNegative))
 			.attr("r", 5)
 			.attr("fill", "grey")
 			.on("click", d =>   vis.updateVideo(d.videoTitle)) 
 			.transition(1000)
-				.attr("cy", d => vis.y(d.positiveSentimentCount))
+				.attr("cy", d => vis.y(d.percentPositive))
 
 
 			
@@ -216,14 +220,62 @@ function flattenArray(sentimentData, topVideoData){
 	let merged = [];
 
 	for(let i=0; i<sentimentData.length; i++) {
-	merged.push({
+		let total = sentimentData[i].positiveSentimentCount + sentimentData[i].negativeSentimentCount + sentimentData[i].neutralSentimentCount
+		merged.push({
 	   ...sentimentData[i], 
+	   sentimentDiff: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1) - ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1), 
+	   percentPositive: ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1),
+	   percentNegative: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1),
+	   percentNeutral: ((sentimentData[i].neutralSentimentCount/total)*100).toFixed(1),
+	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
+	  );
+	}
+	return merged
+
+}
+
+function flattenArray2(sentimentData, topVideoData){
+	let merged = [];
+
+	for(let i=0; i<topVideoData.length; i++) {
+		let total = sentimentData[i].positiveSentimentCount + sentimentData[i].negativeSentimentCount + sentimentData[i].neutralSentimentCount
+		merged.push({
+	   ...sentimentData[i], 
+	   ...topVideoData[i],
+	   sentimentDiff: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1) - ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1), 
+	   percentPositive: ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1),
+	   percentNegative: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1),
+	   percentNeutral: ((sentimentData[i].neutralSentimentCount/total)*100).toFixed(1),
 	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
 	  );
 }
 	return merged
 
 }
+
+function flattenArray3(sentimentData, topVideoData){
+	let merged = [];
+
+	for(const videoID in topVideoData) {
+		let total = sentimentData[videoID].positiveSentimentCount + sentimentData[videoID].negativeSentimentCount + sentimentData[videoID].neutralSentimentCount
+		merged.push({
+	   ...sentimentData[videoID], 
+	   ...topVideoData[videoID],
+	   sentimentDiff: ((sentimentData[videoID].negativeSentimentCount/total)*100).toFixed(1) - ((sentimentData[videoID].positiveSentimentCount/total)*100).toFixed(1), 
+	   percentPositive: ((sentimentData[videoID].positiveSentimentCount/total)*100).toFixed(1),
+	   percentNegative: ((sentimentData[videoID].negativeSentimentCount/total)*100).toFixed(1),
+	   percentNeutral: ((sentimentData[videoID].neutralSentimentCount/total)*100).toFixed(1),
+	   ...(sentimentData.find((itmInner) => itmInner.videoID === topVideoData[videoID].videoID))}
+	  );
+}
+	return merged
+
+}
+
+function roundToDecimalPlaces(num, decimalPlaces) {
+	const factor = Math.pow(10, decimalPlaces);
+	return Math.round(num * factor) / factor;
+  }
 
 
 

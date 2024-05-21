@@ -4,7 +4,7 @@ import D3BarChart from './D3BarChart';
 export default class  BarChartWrapper extends Component {
 	componentDidMount() {
 		this.setState({
-			chart: new D3BarChart(this.refs.chart, this.props.data, this.props.topVideoData, this.props.dataMarch22, this.props.topVideoDataMarch22)
+			chart: new D3BarChart(this.refs.chart, this.props.topVideoData, this.props.topVideoDataMarch22)
 
 		})
 	}
@@ -14,9 +14,12 @@ export default class  BarChartWrapper extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
+		//this.setState({
+		//	chart: nextProps.date
+		//})	
 		//this.setState({ data: data, 
-		this.state.chart.update(nextProps.date)
 		//this.state.chart.update(nextProps.activeVideo)
+		this.state.chart.update(nextProps.date)
 
 	}
 	
@@ -25,3 +28,4 @@ export default class  BarChartWrapper extends Component {
 		return <div className="chart-area" ref="chart"></div>
 	}
 }
+

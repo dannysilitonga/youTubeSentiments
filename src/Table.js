@@ -3,26 +3,28 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { blob } from 'd3';
+//import Table from 'react-bootstrap/Table';
 
 
 export default class Table extends Component {
 	renderRows() {
-	
+		const numberVideos = 50;
 	// march 15
-	const topVideoRestructured = restructureData(this.props.topVideoData)
-	const updatedData = combineData(reorganizeData(getPolarityCount(restrucOrigData(this.props.data))).slice(0,50))
-	let mergedMarch15 = flattenArray(updatedData, topVideoRestructured);	 
-	let mergedMarch15Sorted = mergedMarch15.sort((a, b) => a.sentimentDiff - b.sentimentDiff);
-	
-	//Data March 22
-	const topVideoRestructuredMarch22 = restructureData(this.props.topVideoDataMarch22)
-	const updatedDataMarch22Temp = reorganizeData(getPolarityCount(restrucOrigData(this.props.dataMarch22))).slice(0,50);
-	const filteredMarch22 = updatedDataMarch22Temp.filter(item => !(item.sentimentData.length < 3));
-	const updatedDataMarch22 = combineData(filteredMarch22);
-	let mergedMarch22 = flattenArray(updatedDataMarch22, topVideoRestructuredMarch22); 
-	let mergedMarch22Sorted = mergedMarch22.sort((a, b) => a.sentimentDiff - b.sentimentDiff);
-
-	const data = (this.props.date == "march15") ?  mergedMarch15Sorted : mergedMarch22Sorted	
+		const topVideoRestructured = restructureData(this.props.topVideoData).slice(0,numberVideos)
+		const updatedData = combineData(reorganizeData(getPolarityCount(restrucOrigData(this.props.data))).slice(0,numberVideos))
+		let mergedMarch15Sorted = flattenArray2(updatedData, topVideoRestructured);	 
+		// let mergedMarch15Sorted = mergedMarch15.sort((a, b) => a.percentNegative - b.percentNegative) //a.sentimentDiff - b.sentimentDiff);
+		
+		//Data March 22
+		const topVideoRestructuredMarch22 = restructureData(this.props.topVideoDataMarch22).slice(0,numberVideos)
+		const updatedDataMarch22Temp = reorganizeData(getPolarityCount(restrucOrigData(this.props.dataMarch22)))
+		const filteredMarch22 = updatedDataMarch22Temp.filter(item => !(item.sentimentData.length < 3));
+		const updatedDataMarch22 = combineData(filteredMarch22);
+		let mergedMarch22Sorted = flattenArray2(updatedDataMarch22, topVideoRestructuredMarch22); 
+		//let mergedMarch22Sorted = mergedMarch22.sort((a, b) => a.percentNegative - b.percentNegative) //a.sentimentDiff - b.sentimentDiff);
+		console.log("mergedMarch22Sorted", mergedMarch22Sorted)
+		const data = (this.props.date == "march15") ?  mergedMarch15Sorted : mergedMarch22Sorted	
 
         return (  
             data.map(video => {
@@ -32,14 +34,14 @@ export default class Table extends Component {
 		
                 return (
 					
-                    <Row
+                    <Row 
                         key={video.videoTitle}
                         style= {{ marginTop: "10px", backgroundColor: background }}
                     >
-                        <Col xs={6} style= {{ fontSize: 11}}>{video.videoTitle}</Col>
-                        <Col xs={2} style= {{ fontSize: 11}}>{video.negativeSentimentCount}</Col>
-                        <Col xs={2}style= {{ fontSize: 11}}>{video.positiveSentimentCount}</Col>
-						<Col xs={2}style= {{ fontSize: 11}}>{video.sentimentDiff}</Col>
+                        <Col xs={6} style= {{ fontSize: 11}}  >{video.videoTitle}</Col>
+                        <Col xs={2} style= {{ fontSize: 11,  display:'flex', justifyContent:'center'}} >{video.percentNegative}</Col>
+                        <Col xs={2}style= {{ fontSize: 11,  display:'flex', justifyContent:'center'}}>{video.percentPositive}</Col>
+						<Col xs={2}style= {{ fontSize: 11,  display:'flex', justifyContent:'center'}}>{video.percentNeutral}</Col>
                         
                 </Row>
                 )
@@ -50,32 +52,17 @@ export default class Table extends Component {
         return (
         <div>
             <Row>
-                <Col xs={6}>
-                    <Form.Control 
-                        placeholder={"Video Title"}
-						style={{ fontSize: 11 }}
-                        video ID={"videoTitle"}
-                    />
+                <Col xs={6} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                    Video Title
                 </Col>
-                <Col xs={2}>
-                    <Form.Control 
-                        placeholder={"-"}
-						style={{ fontSize: 11 }}
-                        video ID={"negativeSentimentCount"}
-                    />
+                <Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                    Negative (%)
                 </Col>
-                <Col xs={2}>
-                    <Form.Control 
-                        placeholder={"+"}
-                        video ID={"positiveSentimentCount"}
-                    />
+                <Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                    Positive (%)
                 </Col>
-				<Col xs={2}>
-                    <Form.Control 
-                        placeholder={"D"}
-						style={{ fontSize: 11 }}
-                        video ID={"sentimentDiff"}
-                    />
+				<Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+					Neutral (%)
                 </Col>
                 
             </Row>
@@ -165,9 +152,32 @@ function flattenArray(sentimentData, topVideoData){
 	let merged = [];
 
 	for(let i=0; i<sentimentData.length; i++) {
+		let total = sentimentData[i].positiveSentimentCount + sentimentData[i].negativeSentimentCount + sentimentData[i].neutralSentimentCount
 	merged.push({
 	   ...sentimentData[i], 
-	   sentimentDiff: sentimentData[i].positiveSentimentCount - sentimentData[i].negativeSentimentCount, 
+	   sentimentDiff: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1) - ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1), 
+	   percentPositive: ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1),
+	   percentNegative: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1),
+	   percentNeutral: ((sentimentData[i].neutralSentimentCount/total)*100).toFixed(1),
+	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
+	  );
+	}
+	return merged
+
+}
+
+function flattenArray2(sentimentData, topVideoData){
+	let merged = [];
+
+	for(let i=0; i<topVideoData.length; i++) {
+		let total = sentimentData[i].positiveSentimentCount + sentimentData[i].negativeSentimentCount + sentimentData[i].neutralSentimentCount
+	merged.push({
+	   ...sentimentData[i], 
+	   ...topVideoData[i],
+	   sentimentDiff: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1) - ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1), 
+	   percentPositive: ((sentimentData[i].positiveSentimentCount/total)*100).toFixed(1),
+	   percentNegative: ((sentimentData[i].negativeSentimentCount/total)*100).toFixed(1),
+	   percentNeutral: ((sentimentData[i].neutralSentimentCount/total)*100).toFixed(1),
 	   ...(topVideoData.find((itmInner) => itmInner.videoID === sentimentData[i].videoID))}
 	  );
 }
@@ -175,3 +185,20 @@ function flattenArray(sentimentData, topVideoData){
 
 }
 
+function roundToDecimalPlaces(num, decimalPlaces) {
+	const factor = Math.pow(10, decimalPlaces);
+	return Math.round(num * factor) / factor;
+  }
+
+  function roundNumber(num, scale) {
+	if(!("" + num).includes("e")) {
+	  return +(Math.round(num + "e+" + scale)  + "e-" + scale);
+	} else {
+	  var arr = ("" + num).split("e");
+	  var sig = ""
+	  if(+arr[1] + scale > 0) {
+		sig = "+";
+	  }
+	  return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+	}
+  }
