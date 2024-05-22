@@ -88,22 +88,29 @@ class App extends Component {
         </Navbar>
         <Container fluid>
           <Row> 
-            <p style={{marginLeft: 15}}>This projects examines the level of positive and negative sentiments on Youtube among the 
-            top 50 most trending videos. The original data comes from YouTube on a daily basis, which is extracted, along with their 
-            associated comments, using YouTube free API services. After the data has been cleaned, e.g. removing comments in other than English, 
-            a Natural Language Process model is applied to the comments to assess the level of polarity of each comment for each of 
-            the top trending videos. The polarity level determines weather a comment is labeled negative, positive or neutral. Both 
-            the top trending video data and the sentiment data are saved in a realtime document database using Google's Firebase. 
-            The database contains daily data from mid March to mid May, from 5 English speaking countries: the US, the UK, Ireland, 
-            Australia, and New Zealand. </p> 
+            <p style={{marginLeft: 15}}>This projects examines the level of polarity among the top 50 most trending videos on Youtube, 
+            determined by the number of views. The original data comes on a daily basis, extracted, along with their 
+            associated comments, using the site's free API services. After the data has been cleaned, e.g. removing comments in 
+            languages other than English, a Natural Language Process model is applied to the comments to assess the level of polarity 
+            of each comment for each of the top trending videos. The polarity level determines whether a comment should be 
+            labeled negative, positive or neutral. </p>
+
+            <p style={{marginLeft: 15}}> Both the top trending video data and the sentiment data are saved in a realtime document database 
+            on Google's Firebase. This database contains daily data from mid March to mid May, from 5 English speaking countries: 
+            the US, the UK, Ireland, Australia, and New Zealand. </p> 
             
-            <p style={{marginLeft: 15}}> The visualization extracts both the top trending video and the sentiment data from the Firebase database. 
-            The sentiment data is used to calculate the percentage of negative, positive and neutral comments for each video. 
-            The table on the right shows the top 50 trending videos, with the percentage of negative, positive and neutral comments. 
-            The bar chart on the left shows the top trending videos, determined by the number of views, for the selected date.
-            The scatterplot shows the percentage of negative comments on the x-axis and the percentage of positive comments on the y-axis. 
-            Upon clicking on a circle in the scatterplot, the table on the right will display the video title, and the percentage of negative, 
-            positive and neutral comments for the selected video. The drop down menu allows the user to select the date for which the data. 
+            <p style={{marginLeft: 15}}> The visualization extracts both the top trending video and the sentiment data 
+            from the Firebase database. The sentiment data is used to calculate the percentage of negative, positive, and 
+            neutral comments for each video. The table on the right shows the top 50 trending videos, with the 
+            percentage of negative, positive and neutral comments for a given video. The bar chart on the left 
+            shows the histogram of the top trending videos, for the selected date. The scatterplot, below the bar chart, 
+            shows the percentage of negative comments on the x-axis and the percentage of positive comments on the y-axis. 
+            Upon clicking on a given circle in the scatterplot, the table on the right will display the video title, 
+            and the percentage of negative, positive and neutral comments for the selected video. Please note: Some 
+            video data has been removed from the table, when a given video does not have at least 1 positive, 
+            1 negative and 1 neutral comment. This is done for simplicity purposes. The drop down menu allows the 
+            user to select the date for which the data should be used for visualization. For simplicity purposes, there 
+            are 2 date options and the analysis is done for the US data only.
             
             </p>
             <p> </p>
