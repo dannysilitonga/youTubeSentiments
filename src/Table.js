@@ -36,7 +36,7 @@ export default class Table extends Component {
 					
                     <Row 
                         key={video.videoTitle}
-                        style= {{ marginTop: "10px", backgroundColor: background }}
+                        style= {{ marginTop: "10px", marginLeft: "-160px", backgroundColor: background }}
                     >
                         <Col xs={6} style= {{ fontSize: 11}}  >{video.videoTitle}</Col>
                         <Col xs={2} style= {{ fontSize: 11,  display:'flex', justifyContent:'center'}} >{video.percentNegative}</Col>
@@ -52,16 +52,16 @@ export default class Table extends Component {
         return (
         <div>
             <Row>
-                <Col xs={6} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
+                <Col xs={6} style= {{ fontSize: 16,  marginLeft: "-150px", display:'flex', justifyContent:'center'}}>
                     Video Title
                 </Col>
-                <Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
+                <Col xs={2} style= {{ fontSize: 16,  marginLeft: "70px", display:'flex', justifyContent:'center'}}>
                     Negative (%)
                 </Col>
-                <Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
+                <Col xs={2} style= {{ fontSize: 16,  marginLeft: "30px", display:'flex', justifyContent:'center'}}>
                     Positive (%)
                 </Col>
-				<Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
+				<Col xs={2} style= {{ fontSize: 16,  marginLeft: "20px", display:'flex', justifyContent:'center'}}>
 					Neutral (%)
                 </Col>
                 

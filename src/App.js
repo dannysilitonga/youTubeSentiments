@@ -84,37 +84,51 @@ class App extends Component {
     return (
       <div>
         <Navbar bg="light">
-          <Navbar.Brand>Sentiment Analysis</Navbar.Brand>
+          <Navbar.Brand>Polarity Analysis on Top 50 Most Trending YouTube Videos</Navbar.Brand>
         </Navbar>
         <Container fluid>
-          <Row> 
-            <p style={{marginLeft: 15}}>This projects examines the level of polarity among the top 50 most trending videos on Youtube, 
-            determined by the number of views. The original data comes on a daily basis, extracted, along with their 
-            associated comments, using the site's free API services. After the data has been cleaned, e.g. removing comments in 
-            languages other than English, a Natural Language Process model is applied to the comments to assess the level of polarity 
-            of each comment for each of the top trending videos. The polarity level determines whether a comment should be 
-            labeled negative, positive or neutral. </p>
+          <Row>
+            <Col md={6}>  
+            <p style={{marginLeft: 15, marginTop: 5}}>This projects examines the level of polarity among the 50 most popular 
+            videos on Youtube on a given day, measured from the viewers' comments for each video. Video popularity is determined 
+            by the number of views received. The raw data also includes the text data of the viewers' 
+            comments, which is pulled using the Google free API services. A ceiling of 100 comments for 
+            each video extracted is imposed to adhere to Google's free API policies. </p>
+            
+            <p style={{marginLeft: 15}}> After the data has been cleaned, e.g. removing comments in 
+            languages other than English, a Natural Language Process (NLP) model is applied to assess 
+            the level of polarity of each comment for each video data processed. The NLP model determines 
+            whether a given comment should be labeled negative, positive or neutral. </p>
 
-            <p style={{marginLeft: 15}}> Both the top trending video data and the sentiment data are saved in a realtime document database 
-            on Google's Firebase. This database contains daily data from mid March to mid May, from 5 English speaking countries: 
-            the US, the UK, Ireland, Australia, and New Zealand. </p> 
+            <p style={{marginLeft: 15}}> Both the top trending video data and the sentiment data are stored 
+            in a realtime document database, employing Google's Firebase database. This database contains 
+            daily data from mid-March to mid-May, from 5 predominantly English speaking countries: the US, the UK, Ireland, 
+            Australia, and New Zealand. The database can be found: <a href="https://sentimentviz-default-rtdb.firebaseio.com/"> 
+            Youtube Data on Firebase.</a> </p> 
+
+            </Col>
+            <Col md={6}> 
             
-            <p style={{marginLeft: 15}}> The visualization extracts both the top trending video and the sentiment data 
-            from the Firebase database. The sentiment data is used to calculate the percentage of negative, positive, and 
-            neutral comments for each video. The table on the right shows the top 50 trending videos, with the 
-            percentage of negative, positive and neutral comments for a given video. The bar chart on the left 
-            shows the histogram of the top trending videos, for the selected date. The scatterplot, below the bar chart, 
-            shows the percentage of negative comments on the x-axis and the percentage of positive comments on the y-axis. 
-            Upon clicking on a given circle in the scatterplot, the table on the right will display the video title, 
-            and the percentage of negative, positive and neutral comments for the selected video. Please note: Some 
-            video data has been removed from the table, when a given video does not have at least 1 positive, 
-            1 negative and 1 neutral comment. This is done for simplicity purposes. The drop down menu allows the 
-            user to select the date for which the data should be used for visualization. For simplicity purposes, there 
-            are 2 date options and the analysis is done for the US data only.
-            
+            <p style={{marginLeft: 15}}> Using their API services, the visualization app connects to both the top 
+            trending video and the sentiment data from the Firebase database. The sentiment data is used to calculate 
+            the percentages of negative, positive, and neutral comments for each video shown. The table on 
+            the right displays the statistics for the 50 most popular videos for the selected day. 
+            The bar chart on the left shows the histogram of the most trending videos for the selected date. 
+            The scatterplot, below the bar chart, 
+            shows the percentage of negative comments on the x-axis and the percentage of positive comments on 
+            the y-axis. 
+            Upon clicking on any of the circles in the scatterplot, the table on the right would highlight the video title, 
+            and the percentages of negative, positive and neutral comments for the selected video. Please note: Some 
+            video data has been removed from the table when a given video does not have at least 1 positive, 
+            1 negative, and 1 neutral comment. This is done for simplicity purposes. The drop down menu allows the 
+            user to select the date for which the data would be used to update the visualization. For simplicity purposes, there 
+            are 2 date options, and the analysis is done for the US data only.
             </p>
-            <p> </p>
-            <p> </p>
+            <p style={{marginLeft: 15}}>Netlify is used for deployment purposes. This is done for ease of use as well
+            as for automatic deployment upon new code updates. The code for this project can be found on Github: 
+            <a href="https://github.com/dannysilitonga/youTubeSentiments/tree/master"> YouTube Sentiments on Github.</a>
+            </p>
+            </Col>
           </Row>
           <Row>
             <Col xs={12}><DateDropdown dateSelected={this.dateSelected} /></Col>

@@ -4,8 +4,8 @@ import * as d3 from 'd3'
 //const WIDTH = 860 - MARGIN.LEFT - MARGIN.RIGHT;
 //const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
 
-const MARGIN = { TOP: 10, BOTTOM: 120, LEFT: 100, RIGHT: 10 }
-const WIDTH = 1100 - MARGIN.LEFT - MARGIN.RIGHT
+const MARGIN = { TOP: 10, BOTTOM: 120, LEFT: 100, RIGHT: 5 }
+const WIDTH = 950 - MARGIN.LEFT - MARGIN.RIGHT
 const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM
 
 export default class D3BarChart {

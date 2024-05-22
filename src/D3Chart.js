@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 
-const MARGIN = { TOP: 20, BOTTOM: 80, LEFT: 100, RIGHT: 10 }
-const WIDTH = 1100 - MARGIN.LEFT - MARGIN.RIGHT
+const MARGIN = { TOP: 20, BOTTOM: 80, LEFT: 100, RIGHT: 5 }
+const WIDTH = 950 - MARGIN.LEFT - MARGIN.RIGHT
 const HEIGHT = 500 - MARGIN.TOP - MARGIN.BOTTOM
 
 
@@ -73,7 +73,7 @@ class D3Chart {
 		vis.g.append("text")
 			.attr("x", WIDTH / 2)
 			.attr("y", HEIGHT + 40)
-			.attr("font-size", 20)
+			.attr("font-size", 18)
 			.attr("text-anchor", "middle")
 			.text("Negative Sentiments (%)")
 
@@ -81,7 +81,7 @@ class D3Chart {
 			.attr("x", -(HEIGHT /2))
 			.attr("y", -50)
 			.attr("transform", "rotate(-90)")
-			.attr("font-size", 20)
+			.attr("font-size", 18)
 			.attr("text-anchor", "middle")
 			.text("Positive Sentiments (%)")
 
