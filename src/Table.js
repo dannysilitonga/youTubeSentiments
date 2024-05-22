@@ -52,16 +52,16 @@ export default class Table extends Component {
         return (
         <div>
             <Row>
-                <Col xs={6} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                <Col xs={6} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
                     Video Title
                 </Col>
-                <Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                <Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
                     Negative (%)
                 </Col>
-                <Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+                <Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
                     Positive (%)
                 </Col>
-				<Col xs={2} style= {{ fontSize: 18,  display:'flex', justifyContent:'center'}}>
+				<Col xs={2} style= {{ fontSize: 16,  display:'flex', justifyContent:'center'}}>
 					Neutral (%)
                 </Col>
                 

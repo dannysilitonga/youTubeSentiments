@@ -75,7 +75,7 @@ class D3Chart {
 			.attr("y", HEIGHT + 40)
 			.attr("font-size", 20)
 			.attr("text-anchor", "middle")
-			.text("Negative Sentiments")
+			.text("Negative Sentiments (%)")
 
 		vis.g.append("text")
 			.attr("x", -(HEIGHT /2))
@@ -83,7 +83,7 @@ class D3Chart {
 			.attr("transform", "rotate(-90)")
 			.attr("font-size", 20)
 			.attr("text-anchor", "middle")
-			.text("Positive Sentiments")
+			.text("Positive Sentiments (%)")
 
 		vis.update("march15")
 		
