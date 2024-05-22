@@ -97,7 +97,7 @@ class App extends Component {
             The database contains daily data from mid March to mid May, from 5 English speaking countries: the US, the UK, Ireland, 
             Australia, and New Zealand. </p> 
             
-            <p> The visualization extracts both the top trending video and the sentiment data from the Firebase database. 
+            <p style={{marginLeft: 15}}> The visualization extracts both the top trending video and the sentiment data from the Firebase database. 
             The sentiment data is used to calculate the percentage of negative, positive and neutral comments for each video. 
             The table on the right shows the top 50 trending videos, with the percentage of negative, positive and neutral comments. 
             The bar chart on the left shows the top trending videos, determined by the number of views, for the selected date.
